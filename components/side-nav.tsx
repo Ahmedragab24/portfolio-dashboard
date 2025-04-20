@@ -12,6 +12,7 @@ import {
   ChartNoAxesCombined,
   FileUser,
   ScrollText,
+  ListTodo,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -84,6 +85,12 @@ export function SideNav() {
       href: "/dashboard/certificates",
       icon: ScrollText,
       isActive: pathname.includes("/dashboard/certificates"),
+    },
+    {
+      title: "Todo App",
+      href: "/dashboard/todoList",
+      icon: ListTodo,
+      isActive: pathname.includes("/dashboard/todoList"),
     },
   ];
 

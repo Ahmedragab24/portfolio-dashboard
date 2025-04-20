@@ -41,6 +41,8 @@ const ABOUT_COLLECTION_ID =
   process.env.NEXT_PUBLIC_APPWRITE_ABOUT_COLLECTION_ID || "";
 const CERTIFICATES_COLLECTION_ID =
   process.env.NEXT_PUBLIC_APPWRITE_CERTIFICATES_COLLECTION_ID || "";
+const TODOLIST_COLLECTION_ID =
+  process.env.NEXT_PUBLIC_APPWRITE_TODOLIST_COLLECTION_ID || "";
 
 // Project type based on your schema
 export interface Project {
@@ -130,6 +132,28 @@ export interface Certificates {
   $updatedAt?: string;
   name: string;
   certificate: string;
+}
+
+export type Priority = "Low" | "Medium" | "High";
+
+export type TodoCategory =
+  | "Worship"
+  | "Personality"
+  | "Programming"
+  | "Work"
+  | "Health"
+  | "Other";
+
+export interface TodoList {
+  $id?: string;
+  $createdAt?: string;
+  $updatedAt?: string;
+  Title: string;
+  Description: string;
+  completed: boolean;
+  Date: Date;
+  Priority: Priority;
+  Category: TodoCategory;
 }
 
 // Check if we can make API calls
@@ -1022,6 +1046,122 @@ export async function deleteCertificate(id: string) {
     return true;
   } catch (error) {
     console.error("Error deleting certificate:", error);
+    throw error;
+  }
+}
+
+// Get all todos
+export async function getTodos() {
+  if (!canMakeApiCalls() || !TODOLIST_COLLECTION_ID) {
+    console.error("Cannot fetch todos: Missing configuration");
+    return [];
+  }
+
+  try {
+    const response = await databases!.listDocuments(
+      DATABASE_ID,
+      TODOLIST_COLLECTION_ID
+    );
+    return response.documents as unknown as TodoList[];
+  } catch (error) {
+    console.error("Error fetching todos:", error);
+    return [];
+  }
+}
+
+// Get a single todo
+export async function getTodo(id: string) {
+  if (!canMakeApiCalls() || !TODOLIST_COLLECTION_ID) {
+    console.error("Cannot fetch todo: Missing configuration");
+    throw new Error("Missing configuration");
+  }
+
+  try {
+    const response = await databases!.getDocument(
+      DATABASE_ID,
+      TODOLIST_COLLECTION_ID,
+      id
+    );
+    return response as unknown as TodoList;
+  } catch (error) {
+    console.error("Error fetching todo:", error);
+    throw error;
+  }
+}
+
+// Create a new todo
+export async function createTodo(
+  todo: Omit<TodoList, "$id" | "$createdAt" | "$updatedAt">
+) {
+  if (!canMakeApiCalls() || !TODOLIST_COLLECTION_ID) {
+    console.error("Cannot create todo: Missing configuration");
+    throw new Error("Missing configuration");
+  }
+
+  try {
+    // Convert Date objects to ISO strings for Appwrite
+    const todoData = {
+      ...todo,
+    };
+
+    const response = await databases!.createDocument(
+      DATABASE_ID,
+      TODOLIST_COLLECTION_ID,
+      ID.unique(),
+      todoData
+    );
+    return response as unknown as TodoList;
+  } catch (error) {
+    console.error("Error creating todo:", error);
+    throw error;
+  }
+}
+
+// Update a todo
+export async function updateTodo(id: string, todo: Partial<TodoList>) {
+  if (!canMakeApiCalls() || !TODOLIST_COLLECTION_ID) {
+    console.error("Cannot update todo: Missing configuration");
+    throw new Error("Missing configuration");
+  }
+
+  try {
+    // Create a clean copy without system properties
+    const {
+      $id,
+      $createdAt,
+      $updatedAt,
+      $databaseId,
+      $collectionId,
+      ...cleanTodo
+    } = todo as any;
+
+    // Convert Date objects to ISO strings
+
+    const response = await databases!.updateDocument(
+      DATABASE_ID,
+      TODOLIST_COLLECTION_ID,
+      id,
+      cleanTodo
+    );
+    return response as unknown as TodoList;
+  } catch (error) {
+    console.error("Error updating todo:", error);
+    throw error;
+  }
+}
+
+// Delete a todo
+export async function deleteTodo(id: string) {
+  if (!canMakeApiCalls() || !TODOLIST_COLLECTION_ID) {
+    console.error("Cannot delete todo: Missing configuration");
+    throw new Error("Missing configuration");
+  }
+
+  try {
+    await databases!.deleteDocument(DATABASE_ID, TODOLIST_COLLECTION_ID, id);
+    return true;
+  } catch (error) {
+    console.error("Error deleting todo:", error);
     throw error;
   }
 }
