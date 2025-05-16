@@ -1,13 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Loader2 } from "lucide-react";
 
-import { useAuth } from "@/contexts/auth-context";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -26,7 +25,8 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { ThemeSwitcher } from "@/components/theme-switcher";
-import { logout } from "@/lib/auth";
+import { login, logout, getCurrentUser } from "@/lib/auth";
+import { toast } from "@/hooks/use-toast";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -36,8 +36,8 @@ const loginSchema = z.object({
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
-  const { login } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const [checkingAuth, setCheckingAuth] = useState(true);
   const router = useRouter();
   const searchParams = useSearchParams();
   const from = searchParams.get("from") || "/dashboard";
@@ -50,16 +50,52 @@ export default function LoginPage() {
     },
   });
 
+  useEffect(() => {
+    const checkSession = async () => {
+      try {
+        const user = await getCurrentUser();
+        if (user) {
+          window.location.href = from;
+        } else {
+          router.push(from);
+        }
+      } catch {
+      } finally {
+        setCheckingAuth(false);
+      }
+    };
+
+    checkSession();
+  }, [from, router]);
+
   async function onSubmit(data: LoginFormValues) {
     setIsLoading(true);
     try {
       await login(data.email, data.password);
       router.push(from);
+      window.location.href = from;
+      toast({
+        title: "Login successful",
+        description: "You are now logged in.",
+      });
     } catch (error) {
       console.error("Login error:", error);
+      toast({
+        title: "Login failed",
+        description: "Please check your email and password and try again.",
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
+  }
+
+  if (checkingAuth) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="animate-spin w-6 h-6" />
+      </div>
+    );
   }
 
   return (
@@ -68,7 +104,7 @@ export default function LoginPage() {
         <ThemeSwitcher />
       </div>
 
-      <Button onClick={() => logout()}>logout</Button>
+      {/* <Button onClick={() => logout()}>Logout</Button> */}
 
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">

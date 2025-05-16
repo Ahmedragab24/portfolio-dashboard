@@ -10,12 +10,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { Category } from "@/lib/appwrite";
 
 interface IProps {
   children: React.ReactNode;
+  Category?: Category;
 }
 
-const AddCategory = ({ children }: IProps) => {
+const EditCategory = ({ children, Category }: IProps) => {
   const [open, setOpen] = React.useState(false);
 
   return (
@@ -23,15 +25,15 @@ const AddCategory = ({ children }: IProps) => {
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>New Category</DialogTitle>
+          <DialogTitle>Update Your Category</DialogTitle>
           <DialogDescription>
-            Add details about your Category to your portfolio
+            Update details about your Category to your portfolio
           </DialogDescription>
         </DialogHeader>
-        <CategoryForm open={open} setOpen={setOpen} />
+        <CategoryForm open={open} setOpen={setOpen} category={Category} />
       </DialogContent>
     </Dialog>
   );
 };
 
-export default AddCategory;
+export default EditCategory;

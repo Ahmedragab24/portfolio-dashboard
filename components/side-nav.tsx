@@ -9,10 +9,11 @@ import {
   MessageSquare,
   Users,
   BookOpenCheck,
-  ChartNoAxesCombined,
+  ChartBar,
   FileUser,
   ScrollText,
   ListTodo,
+  PanelsTopLeft,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -37,56 +38,6 @@ export function SideNav() {
       isActive: pathname === "/dashboard",
     },
     {
-      title: "About Me",
-      href: "/dashboard/about",
-      icon: FileUser,
-      isActive: pathname.includes("/dashboard/about"),
-    },
-    {
-      title: "Statistics",
-      href: "/dashboard/statistics",
-      icon: ChartNoAxesCombined,
-      isActive: pathname.includes("/dashboard/statistics"),
-    },
-
-    {
-      title: "Projects",
-      href: "/dashboard/projects",
-      icon: FolderKanban,
-      isActive: pathname.includes("/dashboard/projects"),
-    },
-
-    {
-      title: "Categories",
-      href: "/dashboard/categories",
-      icon: Tag,
-      isActive: pathname.includes("/dashboard/categories"),
-    },
-    {
-      title: "Messages",
-      href: "/dashboard/messages",
-      icon: MessageSquare,
-      isActive: pathname.includes("/dashboard/messages"),
-    },
-    {
-      title: "Reviews",
-      href: "/dashboard/reviews",
-      icon: Users,
-      isActive: pathname.includes("/dashboard/reviews"),
-    },
-    {
-      title: "Experience",
-      href: "/dashboard/experience",
-      icon: BookOpenCheck,
-      isActive: pathname.includes("/dashboard/experience"),
-    },
-    {
-      title: "Certificates",
-      href: "/dashboard/certificates",
-      icon: ScrollText,
-      isActive: pathname.includes("/dashboard/certificates"),
-    },
-    {
       title: "Todo App",
       href: "/dashboard/todoList",
       icon: ListTodo,
@@ -94,36 +45,111 @@ export function SideNav() {
     },
   ];
 
+  const websiteSectionItems = [
+    {
+      title: "About Me",
+      href: "/dashboard/about",
+      icon: FileUser,
+    },
+    {
+      title: "Statistics",
+      href: "/dashboard/statistics",
+      icon: ChartBar,
+    },
+    {
+      title: "Projects",
+      href: "/dashboard/projects",
+      icon: FolderKanban,
+    },
+    {
+      title: "Categories",
+      href: "/dashboard/categories",
+      icon: Tag,
+    },
+    {
+      title: "Messages",
+      href: "/dashboard/messages",
+      icon: MessageSquare,
+    },
+    {
+      title: "Reviews",
+      href: "/dashboard/reviews",
+      icon: Users,
+    },
+    {
+      title: "Experience",
+      href: "/dashboard/experience",
+      icon: BookOpenCheck,
+    },
+    {
+      title: "Certificates",
+      href: "/dashboard/certificates",
+      icon: ScrollText,
+    },
+  ];
+
   return (
     <Sidebar>
       <SidebarHeader>
         <div className="flex h-14 items-center px-4">
-          <Link href="/dashboard" className="flex items-center font-semibold">
-            <span className="text-lg">Portfolio Dashboard</span>
+          <Link
+            href="/dashboard"
+            className="text-lg text-primary font-semibold"
+          >
+            Ahmed Elmadany
           </Link>
         </div>
       </SidebarHeader>
+
       <SidebarContent>
         <SidebarMenu className="px-4">
-          {navItems.map((item) => (
-            <SidebarMenuItem key={item.href}>
-              <SidebarMenuButton
-                asChild
-                isActive={item.isActive}
-                tooltip={item.title}
-              >
-                <Link
-                  href={item.href}
-                  className={cn("flex items-center gap-3")}
+          {/* Main Navigation */}
+          <div className="flex flex-col gap-2 mb-4">
+            {navItems.map((item) => (
+              <SidebarMenuItem key={item.href}>
+                <SidebarMenuButton
+                  asChild
+                  isActive={item.isActive}
+                  tooltip={item.title}
                 >
-                  <item.icon className="h-4 w-4" />
-                  <span>{item.title}</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
+                  <Link
+                    href={item.href}
+                    className={cn("flex items-center gap-3")}
+                  >
+                    <item.icon className="h-4 w-4" />
+                    <span>{item.title}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
+          </div>
+
+          {/* Website Section */}
+          <p className="mb-2 px-2 text-sm font-medium text-muted-foreground">
+            Website
+          </p>
+          <div className="space-y-1">
+            {websiteSectionItems.map((item) => (
+              <SidebarMenuItem key={item.href}>
+                <SidebarMenuButton
+                  asChild
+                  isActive={pathname.includes(item.href)}
+                  tooltip={item.title}
+                >
+                  <Link
+                    href={item.href}
+                    className={cn("flex items-center gap-3")}
+                  >
+                    <item.icon className="h-4 w-4" />
+                    <span>{item.title}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
+          </div>
         </SidebarMenu>
       </SidebarContent>
+
       <SidebarRail />
     </Sidebar>
   );

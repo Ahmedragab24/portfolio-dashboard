@@ -13,9 +13,11 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { LogOut, User } from "lucide-react";
 import { ThemeSwitcher } from "@/components/theme-switcher";
+import { useRouter } from "next/navigation";
 
 export function UserNav() {
   const { user, logout } = useAuth();
+  const Router = useRouter();
 
   if (!user) {
     return null;
@@ -56,12 +58,15 @@ export function UserNav() {
             </div>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => Router.push("/dashboard")}
+            className="cursor-pointer"
+          >
             <User className="mr-2 h-4 w-4" />
-            <span>Profile</span>
+            <span className="cursor-pointer">Profile</span>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => logout()}>
+          <DropdownMenuItem onClick={() => logout()} className="cursor-pointer">
             <LogOut className="mr-2 h-4 w-4" />
             <span>Log out</span>
           </DropdownMenuItem>

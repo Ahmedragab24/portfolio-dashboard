@@ -1,16 +1,17 @@
 "use client";
 
-import type React from "react";
-
 import { createContext, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-
-import { getCurrentUser, login, logout, type User } from "@/lib/auth";
-import { useToast } from "@/components/ui/use-toast";
+import {
+  getCurrentUser,
+  login as authLogin,
+  logout as authLogout,
+} from "@/lib/auth";
+import type { User } from "@/lib/auth";
 
 interface AuthContextType {
   user: User | null;
-  isLoading: boolean;
+  loading: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
 }
@@ -19,86 +20,58 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
-  const { toast } = useToast();
 
   useEffect(() => {
-    const checkUser = async () => {
+    const initAuth = async () => {
       try {
         const currentUser = await getCurrentUser();
         setUser(currentUser);
-      } catch (error) {
-        console.error("Error checking user:", error);
+      } catch {
+        setUser(null);
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
     };
 
-    checkUser();
+    initAuth();
   }, []);
 
-  const handleLogin = async (email: string, password: string) => {
-    setIsLoading(true);
+  const login = async (email: string, password: string) => {
+    setLoading(true);
     try {
-      await login(email, password);
+      await authLogin(email, password);
       const currentUser = await getCurrentUser();
       setUser(currentUser);
-      router.push("/dashboard");
-      toast({
-        title: "Login successful",
-        description: `Welcome back, ${currentUser?.name || "user"}!`,
-      });
     } catch (error) {
-      console.error("Login error:", error);
-      toast({
-        title: "Login failed",
-        description: "Invalid email or password. Please try again.",
-        variant: "destructive",
-      });
       throw error;
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
-  const handleLogout = async () => {
-    setIsLoading(true);
+  const logout = async () => {
+    setLoading(true);
     try {
-      await logout();
+      await authLogout();
       setUser(null);
       router.push("/login");
-      toast({
-        title: "Logged out",
-        description: "You have been successfully logged out.",
-      });
     } catch (error) {
-      console.error("Logout error:", error);
-      toast({
-        title: "Logout failed",
-        description: "Failed to log out. Please try again.",
-        variant: "destructive",
-      });
+      console.error("Logout failed:", error);
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        isLoading,
-        login: handleLogin,
-        logout: handleLogout,
-      }}
-    >
+    <AuthContext.Provider value={{ user, loading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
 }
 
-export function useAuth() {
+export function useAuth(): AuthContextType {
   const context = useContext(AuthContext);
   if (context === undefined) {
     throw new Error("useAuth must be used within an AuthProvider");

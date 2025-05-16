@@ -4,18 +4,14 @@ import type { ReactNode } from "react";
 import { useAuth } from "@/contexts/auth-context";
 import { SideNav } from "@/components/side-nav";
 import { UserNav } from "@/components/user-nav";
-import { Loader2 } from "lucide-react";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import Loading from "../login/loading";
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
-  const { isLoading } = useAuth();
+  const { loading } = useAuth();
 
-  if (isLoading) {
-    return (
-      <div className="flex h-screen w-full items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
+  if (loading) {
+    return <Loading />;
   }
 
   return (

@@ -1,5 +1,5 @@
+import { category } from "./../types/index";
 import { Client, Databases, ID } from "appwrite";
-import { number } from "zod";
 
 // Initialize the Appwrite client with better error handling
 const getClient = () => {
@@ -304,6 +304,27 @@ export async function createCategory(category: Category) {
     return response as unknown as Category;
   } catch (error) {
     console.error("Error creating category:", error);
+    throw error;
+  }
+}
+
+// Update a category
+export async function updateCategory(id: string, category: Partial<Category>) {
+  if (!canMakeApiCalls() || !CATEGORIES_COLLECTION_ID) {
+    console.error("Cannot update category: Missing configuration");
+    throw new Error("Missing configuration");
+  }
+
+  try {
+    const response = await databases!.updateDocument(
+      DATABASE_ID,
+      CATEGORIES_COLLECTION_ID,
+      id,
+      category
+    );
+    return response as unknown as Category;
+  } catch (error) {
+    console.error("Error updating category:", error);
     throw error;
   }
 }

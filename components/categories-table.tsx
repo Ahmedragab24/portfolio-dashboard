@@ -1,13 +1,21 @@
-import Link from "next/link"
-import { Pencil } from "lucide-react"
+import Link from "next/link";
+import { Edit, Pencil } from "lucide-react";
 
-import { getCategories } from "@/lib/appwrite"
-import { Button } from "@/components/ui/button"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { DeleteCategoryButton } from "@/components/delete-category-button"
+import { getCategories } from "@/lib/appwrite";
+import { Button } from "@/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { DeleteCategoryButton } from "@/components/delete-category-button";
+import EditCategory from "./edit-category";
 
 export async function CategoriesTable() {
-  const categories = await getCategories()
+  const categories = await getCategories();
 
   return (
     <div className="rounded-md border">
@@ -31,12 +39,13 @@ export async function CategoriesTable() {
                 <TableCell className="font-medium">{category.name}</TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    <Link href={`/dashboard/categories/${category.$id}`}>
-                      <Button variant="outline" size="icon">
+                    <EditCategory Category={category}>
+                      <Button>
                         <Pencil className="h-4 w-4" />
-                        <span className="sr-only">Edit</span>
+                        Edit
                       </Button>
-                    </Link>
+                    </EditCategory>
+
                     <DeleteCategoryButton id={category.$id || ""} />
                   </div>
                 </TableCell>
@@ -46,5 +55,5 @@ export async function CategoriesTable() {
         </TableBody>
       </Table>
     </div>
-  )
+  );
 }

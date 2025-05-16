@@ -57,7 +57,7 @@ export async function ProjectsTable() {
               <TableRow key={project.$id}>
                 <TableCell className="font-medium">{project.title}</TableCell>
                 <TableCell>{getCategoryNames(project.categories)}</TableCell>
-                <TableCell>
+                <TableCell className="max-w-[400px] truncate">
                   {project.Technologies?.join(", ") || "None"}
                 </TableCell>
                 <TableCell>

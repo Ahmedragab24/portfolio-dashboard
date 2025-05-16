@@ -1,11 +1,11 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { Trash2 } from "lucide-react"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Trash2 } from "lucide-react";
 
-import { deleteCategory } from "@/lib/appwrite"
-import { Button } from "@/components/ui/button"
+import { deleteCategory } from "@/lib/appwrite";
+import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,40 +16,40 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
-import { useToast } from "@/components/ui/use-toast"
+} from "@/components/ui/alert-dialog";
+import { useToast } from "@/components/ui/use-toast";
 
 export function DeleteCategoryButton({ id }: { id: string }) {
-  const [isOpen, setIsOpen] = useState(false)
-  const [isDeleting, setIsDeleting] = useState(false)
-  const router = useRouter()
-  const { toast } = useToast()
+  const [isOpen, setIsOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const router = useRouter();
+  const { toast } = useToast();
 
   async function handleDelete() {
-    setIsDeleting(true)
+    setIsDeleting(true);
     try {
-      await deleteCategory(id)
+      await deleteCategory(id);
       toast({
         title: "Category deleted",
         description: "The category has been deleted successfully.",
-      })
-      router.refresh()
+      });
+      router.refresh();
     } catch (error) {
       toast({
         title: "Error",
         description: "Failed to delete the category. Please try again.",
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsDeleting(false)
-      setIsOpen(false)
+      setIsDeleting(false);
+      setIsOpen(false);
     }
   }
 
   return (
     <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
       <AlertDialogTrigger asChild>
-        <Button variant="outline" size="icon">
+        <Button variant="destructive" size="icon">
           <Trash2 className="h-4 w-4" />
           <span className="sr-only">Delete</span>
         </Button>
@@ -58,7 +58,8 @@ export function DeleteCategoryButton({ id }: { id: string }) {
         <AlertDialogHeader>
           <AlertDialogTitle>Are you sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete the category and may affect projects that use it.
+            This action cannot be undone. This will permanently delete the
+            category and may affect projects that use it.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -73,5 +74,5 @@ export function DeleteCategoryButton({ id }: { id: string }) {
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
-  )
+  );
 }

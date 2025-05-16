@@ -47,7 +47,17 @@ export async function login(email: string, password: string) {
   }
 
   try {
+    // 🔄 حاول حذف الجلسة الحالية أولاً إذا كانت موجودة
+    try {
+      await account!.deleteSession("current");
+    } catch (err) {
+      // تجاهل الخطأ إذا لم تكن هناك جلسة
+      console.log("No active session to delete.");
+    }
+
+    // ✅ إنشاء جلسة جديدة
     await account!.createEmailPasswordSession(email, password);
+
     const jwt = await account!.createJWT();
 
     document.cookie = `appwrite-session=${jwt.jwt}; path=/; secure; samesite=lax; max-age=86400`;
