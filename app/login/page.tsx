@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { ThemeSwitcher } from "@/components/theme-switcher";
-import { login, logout, getCurrentUser } from "@/lib/auth";
+import { login } from "@/lib/auth";
 import { toast } from "@/hooks/use-toast";
 
 const loginSchema = z.object({
@@ -35,9 +35,8 @@ const loginSchema = z.object({
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
-export default function LoginPage() {
+function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
-  const [checkingAuth, setCheckingAuth] = useState(true);
   const router = useRouter();
   const searchParams = useSearchParams();
   const from = searchParams.get("from") || "/dashboard";
@@ -50,34 +49,16 @@ export default function LoginPage() {
     },
   });
 
-  useEffect(() => {
-    const checkSession = async () => {
-      try {
-        const user = await getCurrentUser();
-        if (user) {
-          window.location.href = from;
-        } else {
-          router.push(from);
-        }
-      } catch {
-      } finally {
-        setCheckingAuth(false);
-      }
-    };
-
-    checkSession();
-  }, [from, router]);
-
   async function onSubmit(data: LoginFormValues) {
     setIsLoading(true);
     try {
       await login(data.email, data.password);
-      router.push(from);
-      window.location.href = from;
       toast({
         title: "Login successful",
         description: "You are now logged in.",
       });
+      // Use window.location.href for full page reload to ensure cookies are properly set
+      window.location.href = from;
     } catch (error) {
       console.error("Login error:", error);
       toast({
@@ -85,17 +66,8 @@ export default function LoginPage() {
         description: "Please check your email and password and try again.",
         variant: "destructive",
       });
-    } finally {
       setIsLoading(false);
     }
-  }
-
-  if (checkingAuth) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="animate-spin w-6 h-6" />
-      </div>
-    );
   }
 
   return (
@@ -103,8 +75,6 @@ export default function LoginPage() {
       <div className="absolute top-4 right-4">
         <ThemeSwitcher />
       </div>
-
-      {/* <Button onClick={() => logout()}>Logout</Button> */}
 
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
@@ -161,5 +131,44 @@ export default function LoginPage() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+// Loading fallback for Suspense
+function LoginFormSkeleton() {
+  return (
+    <div className="flex min-h-screen flex-col items-center justify-center bg-background px-4 py-12 sm:px-6 lg:px-8">
+      <div className="absolute top-4 right-4">
+        <ThemeSwitcher />
+      </div>
+      <Card className="w-full max-w-md">
+        <CardHeader className="space-y-1">
+          <CardTitle className="text-2xl font-bold">Login</CardTitle>
+          <CardDescription>
+            Enter your credentials to access your dashboard
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <div className="h-4 w-12 bg-muted rounded animate-pulse" />
+            <div className="h-10 w-full bg-muted rounded animate-pulse" />
+          </div>
+          <div className="space-y-2">
+            <div className="h-4 w-16 bg-muted rounded animate-pulse" />
+            <div className="h-10 w-full bg-muted rounded animate-pulse" />
+          </div>
+          <div className="h-10 w-full bg-muted rounded animate-pulse" />
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+// Main export with Suspense wrapper
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<LoginFormSkeleton />}>
+      <LoginForm />
+    </Suspense>
   );
 }

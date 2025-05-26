@@ -31,7 +31,7 @@ import { Separator } from "@/components/ui/separator";
 const projectSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().min(1, "Description is required"),
-  image: z.string().url("Must be a valid URL"),
+  image: z.any().optional(),
   DemoLink: z.string().url("Must be a valid URL").optional().or(z.literal("")),
   githubLink: z
     .string()
@@ -42,6 +42,18 @@ const projectSchema = z.object({
   Technologies: z
     .array(z.string())
     .min(1, "At least one technology is required"),
+  projectType: z
+    .array(
+      z.enum([
+        "ecommerce",
+        "landing",
+        "website",
+        "dashboard",
+        "mobile",
+        "other",
+      ])
+    )
+    .optional(),
 });
 
 type ProjectFormValues = z.infer<typeof projectSchema>;
@@ -73,20 +85,34 @@ export function ProjectForm({ project, categories = [] }: ProjectFormProps) {
       githubLink: project?.githubLink || "",
       categories: project?.categories || [],
       Technologies: project?.Technologies || [],
+      projectType: Array.isArray(project?.projectType)
+        ? project.projectType
+        : project?.projectType
+        ? [project.projectType]
+        : [],
     },
   });
 
   async function onSubmit(data: ProjectFormValues) {
     setIsSubmitting(true);
     try {
+      // Remove projectType from data before sending to Appwrite (it's only for UI)
+      const { projectType, ...restData } = data;
+
+      // Ensure image has a value (required by Project type)
+      const dataToSubmit = {
+        ...restData,
+        image: restData.image || "",
+      };
+
       if (project?.$id) {
-        await updateProject(project.$id, data);
+        await updateProject(project.$id, dataToSubmit);
         toast({
           title: "Project updated",
           description: "The project has been updated successfully.",
         });
       } else {
-        await createProject(data);
+        await createProject(dataToSubmit);
         toast({
           title: "Project created",
           description: "The project has been created successfully.",
@@ -126,6 +152,14 @@ export function ProjectForm({ project, categories = [] }: ProjectFormProps) {
     setImagePreview(url);
   }
 
+  // Get selected project type labels
+  const getProjectTypeLabels = (values: string[] | undefined) => {
+    if (!values || values.length === 0) return [];
+    return values.map(
+      (value) => categories.find((cat) => cat.value === value)?.label || value
+    );
+  };
+
   return (
     <div className="grid gap-6 md:grid-cols-2 px-2">
       <div>
@@ -144,6 +178,7 @@ export function ProjectForm({ project, categories = [] }: ProjectFormProps) {
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="description"
@@ -346,6 +381,27 @@ export function ProjectForm({ project, categories = [] }: ProjectFormProps) {
                   {form.watch("title") || "Project Title"}
                 </p>
               </div>
+
+              {form.watch("projectType") &&
+                form.watch("projectType")!.length > 0 && (
+                  <div>
+                    <h3 className="text-sm font-medium text-muted-foreground">
+                      Project Type / نوع المشروع
+                    </h3>
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {getProjectTypeLabels(form.watch("projectType")).map(
+                        (label, index) => (
+                          <span
+                            key={index}
+                            className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary/10 text-primary"
+                          >
+                            {label}
+                          </span>
+                        )
+                      )}
+                    </div>
+                  </div>
+                )}
 
               <div>
                 <h3 className="text-sm font-medium text-muted-foreground">

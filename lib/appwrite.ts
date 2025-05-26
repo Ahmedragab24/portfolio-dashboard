@@ -1,5 +1,6 @@
 import { category } from "./../types/index";
 import { Client, Databases, ID } from "appwrite";
+import { unstable_noStore as noStore } from "next/cache";
 
 // Initialize the Appwrite client with better error handling
 const getClient = () => {
@@ -44,6 +45,15 @@ const CERTIFICATES_COLLECTION_ID =
 const TODOLIST_COLLECTION_ID =
   process.env.NEXT_PUBLIC_APPWRITE_TODOLIST_COLLECTION_ID || "";
 
+// Project type options
+export type ProjectType =
+  | "ecommerce"
+  | "landing"
+  | "website"
+  | "dashboard"
+  | "mobile"
+  | "other";
+
 // Project type based on your schema
 export interface Project {
   $id?: string;
@@ -54,6 +64,7 @@ export interface Project {
   githubLink?: string;
   categories?: string[];
   Technologies?: string[];
+  projectType?: ProjectType[];
 }
 
 // Category type based on your schema
@@ -173,6 +184,7 @@ const canMakeApiCalls = () => {
 
 // Get all projects
 export async function getProjects() {
+  noStore(); // Disable caching for real-time data
   if (!canMakeApiCalls() || !PROJECTS_COLLECTION_ID) {
     console.error("Cannot fetch projects: Missing configuration");
     return [];
@@ -192,6 +204,7 @@ export async function getProjects() {
 
 // Get a single project
 export async function getProject(id: string) {
+  noStore(); // Disable caching for real-time data
   if (!canMakeApiCalls() || !PROJECTS_COLLECTION_ID) {
     console.error("Cannot fetch project: Missing configuration");
     throw new Error("Missing configuration");
@@ -270,6 +283,7 @@ export async function deleteProject(id: string) {
 
 // Get all categories
 export async function getCategories() {
+  noStore(); // Disable caching for real-time data
   if (!canMakeApiCalls() || !CATEGORIES_COLLECTION_ID) {
     console.error("Cannot fetch categories: Missing configuration");
     return [];
@@ -347,6 +361,7 @@ export async function deleteCategory(id: string) {
 
 // Get all messages
 export async function getMessages() {
+  noStore(); // Disable caching for real-time data
   if (!canMakeApiCalls() || !MESSAGES_COLLECTION_ID) {
     console.error("Cannot fetch messages: Missing configuration");
     return [];
@@ -366,6 +381,7 @@ export async function getMessages() {
 
 // Get a single message
 export async function getMessage(id: string) {
+  noStore(); // Disable caching for real-time data
   if (!canMakeApiCalls() || !MESSAGES_COLLECTION_ID) {
     console.error("Cannot fetch message: Missing configuration");
     throw new Error("Missing configuration");
@@ -403,6 +419,7 @@ export async function deleteMessage(id: string) {
 // Add these functions to your appwrite.ts file
 // Get visitor stats
 export async function getVisitorStats() {
+  noStore(); // Disable caching for real-time data
   if (!canMakeApiCalls() || !DATABASE_ID) {
     console.error("Cannot fetch visitor stats: Missing configuration");
     return { total_visits: 0, last_updated: new Date().toISOString() };
@@ -514,6 +531,7 @@ export async function incrementVisitorCount() {
 
 // Get all reviews
 export async function getReviews() {
+  noStore(); // Disable caching for real-time data
   if (!canMakeApiCalls() || !REVIEWS_COLLECTION_ID || !databases) {
     console.error("Cannot fetch reviews: Missing configuration");
     return [];
@@ -533,6 +551,7 @@ export async function getReviews() {
 
 // Get a single review
 export async function getReview(id: string) {
+  noStore(); // Disable caching for real-time data
   if (!databases || !DATABASE_ID || !REVIEWS_COLLECTION_ID) {
     console.error("Cannot fetch review: Missing configuration");
     throw new Error("Missing configuration");
@@ -625,6 +644,7 @@ export async function deleteReview(id: string) {
 
 // Get All Experiences
 export async function getExperiences() {
+  noStore(); // Disable caching for real-time data
   if (!canMakeApiCalls() || !EXPERIENCE_COLLECTION_ID) {
     console.error("Cannot fetch experiences: Missing configuration");
     return [];
@@ -644,6 +664,7 @@ export async function getExperiences() {
 
 // Get a single experience
 export async function getExperience(id: string) {
+  noStore(); // Disable caching for real-time data
   if (!canMakeApiCalls() || !EXPERIENCE_COLLECTION_ID) {
     console.error("Cannot fetch experience: Missing configuration");
     throw new Error("Missing configuration");
@@ -734,6 +755,7 @@ export async function deleteExperience(id: string) {
 }
 // Get All Statistics
 export async function getStatistics() {
+  noStore(); // Disable caching for real-time data
   if (!canMakeApiCalls() || !STATISTICS_COLLECTION_ID) {
     console.error("Cannot fetch statistics: Missing configuration");
     return [];
@@ -753,6 +775,7 @@ export async function getStatistics() {
 
 // Get a single Statistics
 export async function getStatistic(id: string) {
+  noStore(); // Disable caching for real-time data
   if (!canMakeApiCalls() || !STATISTICS_COLLECTION_ID) {
     console.error("Cannot fetch statistics: Missing configuration");
     throw new Error("Missing configuration");
@@ -844,6 +867,7 @@ export async function deleteStatistics(id: string) {
 
 // Get about information
 export async function getAbout() {
+  noStore(); // Disable caching for real-time data
   if (!canMakeApiCalls() || !ABOUT_COLLECTION_ID) {
     console.error("Cannot fetch about information: Missing configuration");
     throw new Error("Missing configuration");
@@ -959,6 +983,7 @@ export async function deleteAbout(id: string) {
 
 // Get all certificates
 export async function getCertificates() {
+  noStore(); // Disable caching for real-time data
   if (!canMakeApiCalls() || !CERTIFICATES_COLLECTION_ID) {
     console.error("Cannot fetch certificates: Missing configuration");
     return [];
@@ -978,6 +1003,7 @@ export async function getCertificates() {
 
 // Get a single certificate
 export async function getCertificate(id: string) {
+  noStore(); // Disable caching for real-time data
   if (!canMakeApiCalls() || !CERTIFICATES_COLLECTION_ID) {
     console.error("Cannot fetch certificate: Missing configuration");
     throw new Error("Missing configuration");
@@ -1073,6 +1099,7 @@ export async function deleteCertificate(id: string) {
 
 // Get all todos
 export async function getTodos() {
+  noStore(); // Disable caching for real-time data
   if (!canMakeApiCalls() || !TODOLIST_COLLECTION_ID) {
     console.error("Cannot fetch todos: Missing configuration");
     return [];
@@ -1092,6 +1119,7 @@ export async function getTodos() {
 
 // Get a single todo
 export async function getTodo(id: string) {
+  noStore(); // Disable caching for real-time data
   if (!canMakeApiCalls() || !TODOLIST_COLLECTION_ID) {
     console.error("Cannot fetch todo: Missing configuration");
     throw new Error("Missing configuration");

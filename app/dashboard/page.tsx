@@ -38,6 +38,10 @@ import { getAbout } from "@/lib/appwrite";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 
+// Force dynamic rendering to always get fresh data
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function DashboardPage() {
   const about = await getAbout();
   const isConfigured =
@@ -77,7 +81,7 @@ export default async function DashboardPage() {
           <div className="bg-gradient-to-r from-primary/10 to-primary/5 p-6 flex flex-col items-center">
             <div className="h-32 w-32 rounded-full overflow-hidden border-4 border-background shadow-lg mb-4">
               <Image
-                src="https://res.cloudinary.com/dk4yvlwr0/image/upload/v1723554998/me_vdbxlz.png"
+                src="/WhatsApp Image 2025-12-05 at 14.47.35_d247f30b.png"
                 alt={about.name}
                 width={128}
                 height={128}
