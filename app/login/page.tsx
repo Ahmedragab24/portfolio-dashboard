@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { ThemeSwitcher } from "@/components/theme-switcher";
-import { login, logout, getCurrentUser } from "@/lib/auth";
+import { login, getCurrentUser } from "@/lib/auth";
 import { toast } from "@/hooks/use-toast";
 
 const loginSchema = z.object({
@@ -37,7 +37,6 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
-  const [checkingAuth, setCheckingAuth] = useState(true);
   const router = useRouter();
   const searchParams = useSearchParams();
   const from = searchParams.get("from") || "/dashboard";
@@ -50,26 +49,7 @@ export default function LoginPage() {
     },
   });
 
-  useEffect(() => {
-    const checkSession = async () => {
-      try {
-        const user = await getCurrentUser();
-        if (user) {
-          window.location.href = from;
-        } else {
-          router.push(from);
-        }
-      } catch {
-      } finally {
-        setCheckingAuth(false);
-      }
-    };
-
-    checkSession();
-  }, [from, router]);
-
   async function onSubmit(data: LoginFormValues) {
-    setIsLoading(true);
     try {
       await login(data.email, data.password);
       router.push(from);
@@ -86,16 +66,8 @@ export default function LoginPage() {
         variant: "destructive",
       });
     } finally {
-      setIsLoading(false);
+      setIsLoading(true);
     }
-  }
-
-  if (checkingAuth) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="animate-spin w-6 h-6" />
-      </div>
-    );
   }
 
   return (
